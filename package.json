@@ -1,0 +1,32 @@
+{
+  "name": "reso-api-reverse-proxy",
+  "description": "A Reverse Proxy for a RESO API Server",
+  "version": "0.3.14",
+  "homepage": "http://crt.blogs.realtor.org",
+  "author": {
+    "name": "Center for REALTOR Technology",
+    "url": "http://crt.blogs.realtor.org"
+  },
+  "repository": {
+    "url": ""
+  },
+  "keywords": [
+    "reso",
+    "reso api",
+    "reverse proxy",
+    "mls"
+  ],
+  "dependencies": {
+    "btoa": ">=1.1.0",
+    "just.randomstring": ">=0.1.1"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "contributors": [
+    {
+      "name": "Mark Lesswing"
+    }
+  ],
+  "readmeFilename": "README.md"
+}
