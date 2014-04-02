@@ -685,7 +685,7 @@ console.dir(clientHeaders);
   }
   if (userConfig["CACHE_LATENCY"]) {
     bannerLine("- Recipient information is only current for " + userConfig["CACHE_LATENCY"] + " seconds");
-    if (!userConfig["CACHE_METADATA"]) {
+    if (userConfig["CACHE_METADATA"]) {
       bannerLine("  > Metadata requests will be cached");
     } else{
       bannerLine("  > Metadata requests are processed even if information is still current");
