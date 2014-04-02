@@ -1,7 +1,7 @@
 {
   "name": "reso-api-reverse-proxy",
   "description": "A Reverse Proxy for a RESO API Server",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "homepage": "http://crt.blogs.realtor.org",
   "author": {
     "name": "Center for REALTOR Technology",
