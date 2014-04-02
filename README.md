@@ -35,6 +35,8 @@ Some of the configuration values used in the file need to be obtained from the o
 
  CACHE\_LATENCY: The number for seconds that the browser will retain query results.  If you have a high volume site, you can set this to something like 3600 to to only hit the RESO API Server hourly.  Setting this to a low number, such as 1, would provide near real time access to listing data.  
 
+ CACHE\_METADATA: A boolean value that controls the caching of metadata requests for the time period specified in the CACHE\_LATENCY parameter.  Some OData clients send Metadata requests eventhough the previous Metadata request specified that the request was not needed.  This reduced the burden on the RESO API Server for all requests, ensuring that the policy set by the CACHE\_LATENCY parameter is universally applied.  This value was made configurable because it is possible you would like Metadata requests to act as a "heatbeat" to the RESO API Server.  
+
  COMPRESSION: A boolean value that controls whether information is compressed to the consumer.  Compressed is much smaller than normal data.  If the parameter is set to "true", them data will be compressed even the API Server does not support compression.  If the browser does not support compression, no compression will be attempted even if the COMPRESSION parameter is set to "true".
  
  LISTENING\_DOMAIN: The dns name of the the computer that will be running the RESO API Reverse Proxy. If not supplied, the IP Adress of the computer will be used.  

@@ -2,7 +2,8 @@
 // includes
 //
 var accessTokenCache = {} 
-  , responseCache = {};
+  , responseCache = {}
+  , metadataCache = {};
 
 var DEBUG_HEADERS = false;
 
@@ -368,14 +369,17 @@ console.dir(headers);
 console.log(request.method + " " + aURL + " received from " + request.connection.remoteAddress + " consuming " + ((new Date().getTime()) - startTime.getTime()) + " ms");
 } else {
                 if (aURL.indexOf("$metadata") !== -1) {
+                  if (userConfig["CACHE_METADATA"]) {
 //
-// cache metadata request
+// cache metadata requests and don't display the transfer
 //
-/*
-console.dir(headers);
-console.log(returnedResult);
-*/
+                    metadataCache[headers["access-control-allow-origin"]] ["headers"] = headers;
+                    metadataCache[headers["access-control-allow-origin"]] ["response"] = returnedResult;
+                  }
                 } else {
+//
+// display the transfer
+//
                   var methodName = "Unknown";
                   switch (request.method) {
                     case "DELETE":
@@ -470,13 +474,22 @@ console.log((new Date()) + " " + methodName + " from " + request.connection.remo
 
       case "DELETE":
       case "GET":
-/*
-        var aURL = unescape(request.url);
-        if (aURL.indexOf("$metadata") !== -1) {
-console.log("look for metadata");
-console.dir(request.headers);
+        if (userConfig["CACHE_METADATA"]) {
+          if (unescape(request.url).indexOf("$metadata") !== -1) {
+            if (metadataCache[request.headers["origin"]]) {
+              var mCache = metadataCache[request.headers["origin"]];
+              if (((new Date().getTime()) - mCache["age"]) < (userConfig["CACHE_LATENCY"] * 1000)) { 
+                response.writeHead(200, mCache["headers"]);
+                response.write(mCache["response"]);
+                response.end();
+                break;
+              }
+            }
+            metadataCache[request.headers["origin"]] = {
+              "age": (new Date().getTime())
+            }
+          }
         }
-*/
       case "PATCH":
       case "POST":
 
@@ -669,6 +682,14 @@ console.dir(clientHeaders);
     userConfig["USER_AGENT"] = serverName;
     bannerLine("- Configuration value for USER_AGENT not found");
     bannerLine("  > Using default of \"" + userConfig["USER_AGENT"] + "\"");
+  }
+  if (userConfig["CACHE_LATENCY"]) {
+    bannerLine("- Recipient information is only current for " + userConfig["CACHE_LATENCY"] + " seconds");
+    if (!userConfig["CACHE_METADATA"]) {
+      bannerLine("  > Metadata requests will be cached");
+    } else{
+      bannerLine("  > Metadata requests are processed even if information is still current");
+    }
   }
 
   bannerLine();
