@@ -373,10 +373,9 @@ console.log(request.method + " " + aURL + " received from " + request.connection
 //
 // cache metadata requests and don't display the transfer
 //
-                    metadataCache[headers["access-control-allow-origin"]] = {
-                       headers: headers,
-                       response: returnedResult
-                    } 
+                    var anOrigin = headers["access-control-allow-origin"];
+                    metadataCache[anOrigin]["headers"] = headers;
+                    metadataCache[anOrigin]["response"] = returnedResult;
                   }
                 } else {
 //
@@ -478,16 +477,16 @@ console.log((new Date()) + " " + methodName + " from " + request.connection.remo
       case "GET":
         if (userConfig["CACHE_METADATA"]) {
           if (unescape(request.url).indexOf("$metadata") !== -1) {
-            if (metadataCache[request.headers["origin"]]) {
-              var mCache = metadataCache[request.headers["origin"]];
-              if (((new Date().getTime()) - mCache["age"]) < (userConfig["CACHE_LATENCY"] * 1000)) { 
-                response.writeHead(200, mCache["headers"]);
-                response.write(mCache["response"]);
+            var anOrigin = request.headers["origin"] || request.connection.remoteAddress;
+            if (metadataCache[anOrigin]) {
+              if (((new Date().getTime()) - metadataCache[anOrigin]["age"]) < (userConfig["CACHE_LATENCY"] * 1000)) { 
+                response.writeHead(200, metadataCache[anOrigin]["headers"]);
+                response.write(metadataCache[anOrigin]["response"]);
                 response.end();
                 break;
               }
             }
-            metadataCache[request.headers["origin"]] = {
+            metadataCache[anOrigin] = {
               "age": (new Date().getTime())
             }
           }
