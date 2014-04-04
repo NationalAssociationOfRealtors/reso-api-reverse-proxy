@@ -373,8 +373,10 @@ console.log(request.method + " " + aURL + " received from " + request.connection
 //
 // cache metadata requests and don't display the transfer
 //
-                    metadataCache[headers["access-control-allow-origin"]] ["headers"] = headers;
-                    metadataCache[headers["access-control-allow-origin"]] ["response"] = returnedResult;
+                    metadataCache[headers["access-control-allow-origin"]] = {
+                       headers: headers,
+                       response: returnedResult
+                    } 
                   }
                 } else {
 //
