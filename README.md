@@ -57,6 +57,8 @@ Some of the configuration values used in the file need to be obtained from the o
 
  LISTENING\_TIMEOUT: How long to wait for RESO API Server responses before returning an error.
 
+ SELF_SIGNED: A boolean value that controls whether the API Server is usinf "Self Signed" digital certificates.  "Self Signed" certificates are not production safe and are typically used during development and system testing.  For production use, this value should be set to "false".
+
  USER\_AGENT: The name of the account as it is passed in HTTP headers to the API server.  If this parameter is not included, the SERVER\_NAME parameter value will be used.
 
 + Authentication

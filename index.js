@@ -84,7 +84,7 @@ function startReverseProxy(userConfig) {
   var btoa = require("btoa")
     , crypto = require("crypto")
     , http = require("http")
-    , https = require("http")
+    , https = require("https")
     , randomstring = require("just.randomstring")
     , cnonce = randomstring(16);
 
@@ -229,7 +229,7 @@ console.log(bannerText);
       }
       if (post_body) {
         if (post_body.length > 0) {
-          tempHeaders["content-length"] = post_body.length;
+          tempHeaders["content-length"] = Buffer.byteLength(post_body);
         }
       }
 if (DEBUG_HEADERS) {
@@ -240,36 +240,33 @@ console.dir(tempHeaders);
         host: userConfig["API_DOMAIN"],
         port: userConfig["API_PORT"],
         path: request.url,
-        headers: tempHeaders, 
-        method: request.method 
+	method: request.method, 
+        rejectUnauthorized: false,
+        headers: tempHeaders
       };
 
-      var clientRequest;
+      var connectionProtocol = http;
       if (userConfig["API_PROTOCOL"] == "https") {
-       clientRequest = https.request(options, function(clientResponse) {
-if (DEBUG_HEADERS) {
-console.log("RECEIVED_FROM_SERVER");
-console.dir(clientResponse.headers);
-}
-          processBody(clientResponse, authHeader);
-        });
-      } else {
-        clientRequest = http.request(options, function(clientResponse) {
-if (DEBUG_HEADERS) {
-console.log("RECEIVED_FROM_SERVER");
-console.dir(clientResponse.headers);
-}
-          processBody(clientResponse, authHeader);
-        });
+        connectionProtocol = https;
       }
+      var clientRequest = connectionProtocol.request(options, function(clientResponse) {
+if (DEBUG_HEADERS) {
+console.log("RECEIVED_FROM_SERVER");
+console.dir(clientResponse.headers);
+}
+        processBody(clientResponse, authHeader);
+      });
+
       if (post_body) {
         if (post_body.length > 0) {
           clientRequest.write(post_body);
         }
       }
       clientRequest.end();
+
       clientRequest.on('error', function(e) { 
-        errorResponse("MLS Connection Problem") 
+//console.trace(e);
+        errorResponse("MLS Connection " + e) 
       });
       fn = timeout_wrapper(clientRequest);
       timeout = setTimeout(fn,userConfig["LISTENING_TIMEOUT"]);
@@ -649,6 +646,15 @@ console.dir(clientHeaders);
     bannerLine("(" + packageName + ")");
   }
   bannerSpacer();
+
+  if (userConfig["API_PROTOCOL"] == "https") {
+    if (userConfig["SELF_SIGNED"] == null) {
+      userConfig["SELF_SIGNED"] = false;
+    }
+    if (userConfig["SELF_SIGNED"]) {
+      bannerLine("- Server is not production safe because it is using self signed certificates");
+    }
+  }
 
   bannerLine("- Using " + userConfig["AUTH_TYPE"] + " Authentication Scheme");
   switch (userConfig["AUTH_TYPE"]) {
